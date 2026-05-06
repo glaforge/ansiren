@@ -1,6 +1,6 @@
 # Ansiren
 
-A Java library that offers a simple API to render text on stdout with ANSI escape codes, and also to output syntax highlighted markdown text using those ANSI primitives.
+A Java library that offers a simple API to render text on stdout with ANSI escape codes, and also to output syntax highlighted markdown text using those ANSI primitives. It uses the [commonmark-java](https://github.com/commonmark/commonmark-java) library for Markdown parsing.
 
 ## Features
 
