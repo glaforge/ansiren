@@ -18,7 +18,7 @@ Add the following dependency to your `pom.xml` (adjust version as needed):
 <dependency>
     <groupId>io.github.glaforge</groupId>
     <artifactId>ansiren</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
