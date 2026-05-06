@@ -11,6 +11,29 @@
 
     <name>Ansiren</name>
     <description>A Java library for ANSI text and markdown rendering.</description>
+    <url>https://github.com/glaforge/ansiren</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>glaforge</id>
+            <name>Guillaume Laforge</name>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/glaforge/ansiren.git</connection>
+        <developerConnection>scm:git:git@github.com:glaforge/ansiren.git</developerConnection>
+        <url>https://github.com/glaforge/ansiren/tree/main</url>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -37,8 +60,6 @@
             <artifactId>commonmark-ext-yaml-front-matter</artifactId>
             <version>${commonmark.version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.commonmark</groupId>
             <artifactId>commonmark-ext-task-list-items</artifactId>
@@ -72,4 +93,121 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>deployment</id>
+            <properties>
+                <altDeploymentRepository>local::file:./target/staging-deploy</altDeploymentRepository>
+            </properties>
+            <build>
+                <defaultGoal>deploy</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.5.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.3.0</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <attach>true</attach>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>publication</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jreleaser</groupId>
+                        <artifactId>jreleaser-maven-plugin</artifactId>
+                        <version>1.22.0</version>
+                        <configuration>
+                            <jreleaser>
+                                <release>
+                                    <github>
+                                        <overwrite>true</overwrite>
+                                        <changelog>
+                                            <formatted>ALWAYS</formatted>
+                                            <preset>conventional-commits</preset>
+                                            <contributors>
+                                                <format>- {{contributorName}}{{#contributorUsernameAsLink}}
+                                                    ({{.}}){{/contributorUsernameAsLink}}
+                                                </format>
+                                            </contributors>
+                                        </changelog>
+                                    </github>
+                                </release>
+                                <signing>
+                                  <pgp>
+                                    <active>ALWAYS</active>
+                                    <armored>true</armored>
+                                  </pgp>
+                                </signing>
+                                <deploy>
+                                  <maven>
+                                    <mavenCentral>
+                                      <sonatype>
+                                        <active>ALWAYS</active>
+                                        <url>https://central.sonatype.com/api/v1/publisher</url>
+                                        <stagingRepositories>target/staging-deploy</stagingRepositories>
+                                      </sonatype>
+                                    </mavenCentral>
+                                  </maven>
+                                </deploy>
+                            </jreleaser>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <configuration>
+                            <preparationGoals>clean verify</preparationGoals>
+                            <preparationProfiles>deployment,publication</preparationProfiles>
+                            <tagNameFormat>v@{project.version}</tagNameFormat>
+                            <goals>deploy jreleaser:full-release</goals>
+                            <arguments>-ntp -B -DskipTests</arguments>
+                            <scmCommentPrefix>chore:</scmCommentPrefix>
+                            <scmReleaseCommitComment>@{prefix} Releasing version @{releaseLabel}</scmReleaseCommitComment>
+                            <scmDevelopmentCommitComment>@{prefix} Bump for next development cycle</scmDevelopmentCommitComment>
+                            <scmShallowClone>false</scmShallowClone>
+                            <releaseProfiles>deployment,publication</releaseProfiles>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
