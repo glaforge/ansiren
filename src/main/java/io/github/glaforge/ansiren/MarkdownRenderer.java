@@ -15,7 +15,8 @@ public class MarkdownRenderer {
         this.parser = Parser.builder()
                 .extensions(Arrays.asList(
                         TablesExtension.create(),
-                        YamlFrontMatterExtension.create()
+                        YamlFrontMatterExtension.create(),
+                        org.commonmark.ext.task.list.items.TaskListItemsExtension.create()
                 ))
                 .build();
     }
@@ -65,14 +66,14 @@ public class MarkdownRenderer {
         public void visit(StrongEmphasis strongEmphasis) {
             sb.append(Ansi.ready().bold().toString());
             visitChildren(strongEmphasis);
-            sb.append(Ansi.ready().reset().toString());
+            sb.append(Ansi.ready().boldOff().toString());
         }
 
         @Override
         public void visit(Emphasis emphasis) {
             sb.append(Ansi.ready().italic().toString());
             visitChildren(emphasis);
-            sb.append(Ansi.ready().reset().toString());
+            sb.append(Ansi.ready().italicOff().toString());
         }
 
         @Override
@@ -144,17 +145,34 @@ public class MarkdownRenderer {
         }
 
         @Override
-        public void visit(CustomNode customNode) {
-            if (customNode instanceof YamlFrontMatterNode node) {
+        public void visit(CustomBlock customBlock) {
+            if (customBlock instanceof org.commonmark.ext.front.matter.YamlFrontMatterBlock) {
                 sb.append(Ansi.ready().brightMagenta().toString())
                         .append("---")
                         .append("\n");
-                for (String line : node.getValues()) {
-                    sb.append(line).append("\n");
-                }
+                visitChildren(customBlock);
                 sb.append("---")
                         .append(Ansi.ready().reset().toString())
                         .append("\n\n");
+            } else {
+                visitChildren(customBlock);
+            }
+        }
+
+        @Override
+        public void visit(CustomNode customNode) {
+            if (customNode instanceof org.commonmark.ext.task.list.items.TaskListItemMarker marker) {
+                if (marker.isChecked()) {
+                    sb.append("[x] ");
+                } else {
+                    sb.append("[ ] ");
+                }
+            } else if (customNode instanceof YamlFrontMatterNode node) {
+                sb.append(node.getKey()).append(": ");
+                for (String value : node.getValues()) {
+                    sb.append(value).append(" ");
+                }
+                sb.append("\n");
             } else {
                 visitChildren(customNode);
             }

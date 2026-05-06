@@ -24,6 +24,11 @@ public class Ansi {
     public Ansi reverse() { return code("7"); }
     public Ansi conceal() { return code("8"); }
 
+    // Style Offs
+    public Ansi boldOff() { return code("22"); }
+    public Ansi italicOff() { return code("23"); }
+    public Ansi underlineOff() { return code("24"); }
+
     // Foreground Colors
     public Ansi black() { return code("30"); }
     public Ansi red() { return code("31"); }
@@ -53,6 +58,12 @@ public class Ansi {
     public Ansi bgMagenta() { return code("45"); }
     public Ansi bgCyan() { return code("46"); }
     public Ansi bgWhite() { return code("47"); }
+
+    // Extended Colors (256-color and True Color RGB)
+    public Ansi color256(int n) { return code("38;5;" + n); }
+    public Ansi bgColor256(int n) { return code("48;5;" + n); }
+    public Ansi colorRGB(int r, int g, int b) { return code("38;2;" + r + ";" + g + ";" + b); }
+    public Ansi bgColorRGB(int r, int g, int b) { return code("48;2;" + r + ";" + g + ";" + b); }
 
     public Ansi reset() {
         sb.append(RESET);

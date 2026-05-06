@@ -16,7 +16,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <commonmark.version>0.21.0</commonmark.version>
+        <commonmark.version>0.28.0</commonmark.version>
         <junit.version>6.0.3</junit.version>
     </properties>
 
@@ -35,6 +35,13 @@
         <dependency>
             <groupId>org.commonmark</groupId>
             <artifactId>commonmark-ext-yaml-front-matter</artifactId>
+            <version>${commonmark.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.commonmark</groupId>
+            <artifactId>commonmark-ext-task-list-items</artifactId>
             <version>${commonmark.version}</version>
         </dependency>
 
