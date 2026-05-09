@@ -18,6 +18,7 @@ import org.commonmark.parser.Parser;
 import org.commonmark.ext.gfm.tables.TablesExtension;
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension;
 import org.commonmark.ext.front.matter.YamlFrontMatterNode;
+import org.commonmark.ext.task.list.items.TaskListItemsExtension;
 
 import java.util.Arrays;
 
@@ -29,7 +30,7 @@ public class MarkdownRenderer {
                 .extensions(Arrays.asList(
                         TablesExtension.create(),
                         YamlFrontMatterExtension.create(),
-                        org.commonmark.ext.task.list.items.TaskListItemsExtension.create()
+                        TaskListItemsExtension.create()
                 ))
                 .build();
     }
