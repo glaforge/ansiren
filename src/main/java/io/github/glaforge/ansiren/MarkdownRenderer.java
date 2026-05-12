@@ -13,14 +13,31 @@
  */
 package io.github.glaforge.ansiren;
 
-import org.commonmark.node.*;
-import org.commonmark.parser.Parser;
-import org.commonmark.ext.gfm.tables.TablesExtension;
+import java.util.Arrays;
+
+import org.commonmark.ext.front.matter.YamlFrontMatterBlock;
 import org.commonmark.ext.front.matter.YamlFrontMatterExtension;
 import org.commonmark.ext.front.matter.YamlFrontMatterNode;
+import org.commonmark.ext.gfm.tables.TablesExtension;
+import org.commonmark.ext.task.list.items.TaskListItemMarker;
 import org.commonmark.ext.task.list.items.TaskListItemsExtension;
-
-import java.util.Arrays;
+import org.commonmark.node.AbstractVisitor;
+import org.commonmark.node.BlockQuote;
+import org.commonmark.node.BulletList;
+import org.commonmark.node.Code;
+import org.commonmark.node.CustomBlock;
+import org.commonmark.node.CustomNode;
+import org.commonmark.node.Emphasis;
+import org.commonmark.node.FencedCodeBlock;
+import org.commonmark.node.Heading;
+import org.commonmark.node.Link;
+import org.commonmark.node.ListItem;
+import org.commonmark.node.Node;
+import org.commonmark.node.OrderedList;
+import org.commonmark.node.Paragraph;
+import org.commonmark.node.StrongEmphasis;
+import org.commonmark.node.Text;
+import org.commonmark.parser.Parser;
 
 public class MarkdownRenderer {
     private final Parser parser;
@@ -160,7 +177,7 @@ public class MarkdownRenderer {
 
         @Override
         public void visit(CustomBlock customBlock) {
-            if (customBlock instanceof org.commonmark.ext.front.matter.YamlFrontMatterBlock) {
+            if (customBlock instanceof YamlFrontMatterBlock) {
                 sb.append(Ansi.ready().brightMagenta().toString())
                         .append("---")
                         .append("\n");
@@ -175,7 +192,7 @@ public class MarkdownRenderer {
 
         @Override
         public void visit(CustomNode customNode) {
-            if (customNode instanceof org.commonmark.ext.task.list.items.TaskListItemMarker marker) {
+            if (customNode instanceof TaskListItemMarker marker) {
                 if (marker.isChecked()) {
                     sb.append("[x] ");
                 } else {
