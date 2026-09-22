@@ -4,7 +4,7 @@
 
     <groupId>io.github.glaforge</groupId>
     <artifactId>ansiren</artifactId>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.1</version>
     <packaging>jar</packaging>
 
     <name>Ansiren</name>
@@ -30,7 +30,7 @@
         <connection>scm:git:git://github.com/glaforge/ansiren.git</connection>
         <developerConnection>scm:git:git@github.com:glaforge/ansiren.git</developerConnection>
         <url>https://github.com/glaforge/ansiren/tree/main</url>
-        <tag>HEAD</tag>
+        <tag>v0.1.1</tag>
     </scm>
 
     <properties>
