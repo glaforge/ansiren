@@ -85,7 +85,11 @@ public class MarkdownRenderer {
         @Override
         public void visit(Paragraph paragraph) {
             visitChildren(paragraph);
-            sb.append("\n\n");
+            if (paragraph.getParent() instanceof ListItem) {
+                sb.append("\n");
+            } else {
+                sb.append("\n\n");
+            }
         }
 
         @Override
@@ -162,7 +166,9 @@ public class MarkdownRenderer {
                     .append("* ")
                     .append(Ansi.ready().reset().toString());
             visitChildren(listItem);
-            sb.append("\n");
+            if (listItem.getFirstChild() == null) {
+                sb.append("\n");
+            }
         }
 
         @Override

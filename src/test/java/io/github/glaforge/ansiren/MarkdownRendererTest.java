@@ -55,10 +55,18 @@ public class MarkdownRendererTest {
     @Test
     public void testLists() {
         String bulletList = renderer.render("* Item 1\n* Item 2");
-        assertTrue(bulletList.contains("\u001B[94m* \u001B[0mItem 1"));
+        assertTrue(bulletList.contains("\u001B[94m* \u001B[0mItem 1\n\u001B[94m* \u001B[0mItem 2"));
+        assertFalse(bulletList.contains("Item 1\n\n"));
         
         String orderedList = renderer.render("1. Item 1\n2. Item 2");
-        assertTrue(orderedList.contains("\u001B[94m* \u001B[0mItem 1"));
+        assertTrue(orderedList.contains("\u001B[94m* \u001B[0mItem 1\n\u001B[94m* \u001B[0mItem 2"));
+        assertFalse(orderedList.contains("Item 1\n\n"));
+    }
+
+    @Test
+    public void testParagraphs() {
+        String result = renderer.render("Para 1\n\nPara 2");
+        assertTrue(result.contains("Para 1\n\nPara 2"));
     }
 
     @Test
