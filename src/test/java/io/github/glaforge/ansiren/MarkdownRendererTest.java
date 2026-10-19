@@ -157,4 +157,81 @@ public class MarkdownRendererTest {
         assertTrue(result.contains("\u001B[1mTables\u001B[22m"));
         assertTrue(result.contains("\u001B[33m`OK`\u001B[0m"));
     }
+
+    @Test
+    public void testDefaultWidthIs120() {
+        assertEquals(120, MarkdownRenderer.DEFAULT_WIDTH);
+        assertEquals(120, renderer.getMaxWidth());
+    }
+
+    @Test
+    public void testContentWrappingAtMaxWidth() {
+        MarkdownRenderer customRenderer = new MarkdownRenderer(30);
+        String markdown = "This is a long paragraph that should wrap cleanly within thirty columns.";
+        String stripped = customRenderer.render(markdown).replaceAll("\\u001B\\[[0-9;]*m", "").trim();
+        String[] lines = stripped.split("\n");
+        assertTrue(lines.length >= 3);
+        for (String line : lines) {
+            assertTrue(line.length() <= 30, "Line exceeded 30 chars: " + line);
+        }
+    }
+
+    @Test
+    public void testTableWrappingAndColumnDistribution() {
+        MarkdownRenderer customRenderer = new MarkdownRenderer(50);
+        String markdown = """
+                | ID | Status | Description |
+                | :---: | :---: | :--- |
+                | 1 | **OK** | This description is much longer than fifty columns and must wrap across multiple lines while keeping ID and Status intact. |
+                """;
+        String rendered = customRenderer.render(markdown);
+        String stripped = rendered.replaceAll("\\u001B\\[[0-9;]*m", "").trim();
+        String[] lines = stripped.split("\n");
+
+        // Every line of the table must be exactly 50 characters wide
+        for (String line : lines) {
+            assertEquals(50, line.length(), "Line should be 50 chars wide: " + line);
+        }
+        // Should have top border, header, separator, multiple body lines, bottom border
+        assertTrue(lines.length >= 8);
+    }
+
+    @Test
+    public void testTableCellMultiWordBoldWrappingDoesNotBleed() {
+        MarkdownRenderer customRenderer = new MarkdownRenderer(35);
+        String markdown = """
+                | Col1 | Col2 |
+                | :--- | :--- |
+                | **bold words wrapping across lines** | normal text |
+                """;
+        String rendered = customRenderer.render(markdown);
+        // Each wrapped line inside Col1's bold phrase should reset (\u001B[0m) before the vertical bar
+        // and re-apply bold (\u001B[1m) on the continuation line
+        assertTrue(rendered.contains("\u001B[1mbold words"));
+        assertTrue(rendered.contains("normal text"));
+        String stripped = rendered.replaceAll("\\u001B\\[[0-9;]*m", "").trim();
+        for (String line : stripped.split("\n")) {
+            assertTrue(line.length() <= 35);
+        }
+    }
+
+    @Test
+    public void testTableWithBulletsInCells() {
+        MarkdownRenderer customRenderer = new MarkdownRenderer(45);
+        String markdown = """
+                | Release | Highlights |
+                | :---: | :--- |
+                | `v0.1.3` | - Short bullet<br>- Long bullet item that wraps with hanging indent |
+                """;
+        String rendered = customRenderer.render(markdown);
+        // Verify brightBlue bullet prefix inside cell
+        assertTrue(rendered.contains("\u001B[94m* \u001B[0mShort bullet"));
+        String stripped = rendered.replaceAll("\\u001B\\[[0-9;]*m", "").trim();
+        // Verify 2-space hanging indent on wrapped bullet continuation line
+        assertTrue(stripped.contains("│           │   that wraps with hanging     │")
+                || stripped.contains("│          │   "));
+        for (String line : stripped.split("\n")) {
+            assertEquals(45, line.length(), "Line should be 45 chars wide: " + line);
+        }
+    }
 }

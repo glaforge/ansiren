@@ -7,7 +7,8 @@ A Java library that offers a simple API to render text on stdout with ANSI escap
 - **Fluent ANSI API**: Easily build styled strings with colors, backgrounds, and styles.
 - **Extended Colors**: Supports 256-color palette and 24-bit True Color (RGB).
 - **Markdown Rendering**: Render markdown text to terminal with ANSI colors.
-- **GitHub Flavored Markdown**: Supports tables and task lists.
+- **GitHub Flavored Markdown**: Supports tables (with Unicode box-drawing borders, column alignment, smart column width distribution, and multi-line cell wrapping) and task lists.
+- **Automatic Word Wrapping**: Wraps text content and tables at 120 columns by default (configurable via `new MarkdownRenderer(maxWidth)`), preserving ANSI styles across line breaks.
 - **Style Nesting**: Correctly handles nested styles in markdown (e.g., bold inside colored text).
 
 ## Installation
@@ -18,7 +19,7 @@ Add the following dependency to your `pom.xml` (adjust version as needed):
 <dependency>
     <groupId>io.github.glaforge</groupId>
     <artifactId>ansiren</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
@@ -52,6 +53,7 @@ System.out.println(Ansi.ready().colorRGB(255, 100, 50).append("Custom RGB").rese
 ```java
 import io.github.glaforge.ansiren.MarkdownRenderer;
 
+// Default 120-column wrapping (or pass a custom width: new MarkdownRenderer(80))
 MarkdownRenderer renderer = new MarkdownRenderer();
 String markdown = "# Heading\\n\\nThis is **bold** text.";
 String rendered = renderer.render(markdown);
