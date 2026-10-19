@@ -105,4 +105,56 @@ public class MarkdownRendererTest {
         assertTrue(result.contains("[ ]"));
         assertTrue(result.contains("[x]"));
     }
+
+    @Test
+    public void testTableRenderingAndAlignment() {
+        String markdown = """
+                | Name | Age | Role |
+                | :--- | :---: | ---: |
+                | Alice | 30 | Developer |
+                | Bob | 7 | Admin |
+                """;
+        String result = renderer.render(markdown);
+
+        // Verify Unicode box-drawing borders
+        assertTrue(result.contains("┌───────┬─────┬───────────┐"));
+        assertTrue(result.contains("├───────┼─────┼───────────┤"));
+        assertTrue(result.contains("└───────┴─────┴───────────┘"));
+
+        // Strip ANSI codes to verify exact visual alignment
+        String stripped = result.replaceAll("\\u001B\\[[0-9;]*m", "");
+        String expected = """
+                ┌───────┬─────┬───────────┐
+                │ Name  │ Age │      Role │
+                ├───────┼─────┼───────────┤
+                │ Alice │ 30  │ Developer │
+                │ Bob   │  7  │     Admin │
+                └───────┴─────┴───────────┘
+                """;
+        assertEquals(expected.trim(), stripped.trim());
+
+        // Verify header cells are styled in bold brightCyan
+        assertTrue(result.contains("\u001B[1m\u001B[96mName\u001B[0m"));
+    }
+
+    @Test
+    public void testTableWithInlineFormatting() {
+        String markdown = """
+                | Feature | Status |
+                | :--- | :---: |
+                | **Tables** | `OK` |
+                """;
+        String result = renderer.render(markdown);
+        String stripped = result.replaceAll("\\u001B\\[[0-9;]*m", "");
+        String expected = """
+                ┌─────────┬────────┐
+                │ Feature │ Status │
+                ├─────────┼────────┤
+                │ Tables  │  `OK`  │
+                └─────────┴────────┘
+                """;
+        assertEquals(expected.trim(), stripped.trim());
+        assertTrue(result.contains("\u001B[1mTables\u001B[22m"));
+        assertTrue(result.contains("\u001B[33m`OK`\u001B[0m"));
+    }
 }

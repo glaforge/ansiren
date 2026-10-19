@@ -43,6 +43,11 @@ public class Main {
                 
                 > This is a blockquote to test styling.
                 
+                | Feature | Alignment | Status |
+                | :--- | :---: | ---: |
+                | **ANSI Colors** | Left | `Done` |
+                | *Tables* | Center | `Done` |
+                
                 Enjoy using Ansiren!
                 """;
 
